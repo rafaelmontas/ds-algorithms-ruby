@@ -8,8 +8,8 @@
 #
 # ```ruby
 # require 'my_array'
-# m1 = MyArray.new                  #=> #<MyArray: []>
-# m2 = MyArray.new(1, 2, "foo")     #=> #<MyArray: [1, 2, "foo"]>
+# m1 = MyArray[]                    #=> #<MyArray: []>
+# m2 = MyArray[1, 2, "foo"]         #=> #<MyArray: [1, 2, "foo"]>
 # m2.push("bar")                    #=> #<MyArray: [1, 2, "foo", "bar"]>
 # 
 # ## What's here
@@ -17,16 +17,18 @@
 #  First, what's elsewhere. \Class \MyArray:
 # 
 # - Inherits from {class Object}.
-# - Includes {module MyEnumerable}, which provides dozens of additional
+# - Includes {module Enumerable}, which provides dozens of additional
 #   methods.
 # 
 # In particular, class \MyArray doesn't have any methods of its own for
-# fetching or iterating. Instead, it relies on those in \MyEnumerable.
+# fetching or iterating. Instead, it relies on those in \Enumerable.
 # 
 # ## Here, class \MyArray provides methods that are useful for:
 # 
 # ### Methods for Creating a \MyArray
 # 
+# - ::[]:
+#   Return a new MyArray containing the given objects.
 # - ::new:
 #   Return a new MyArray containing the given objects.
 # 
@@ -35,9 +37,7 @@
 # - \#length:
 #   Returns the count of elements.
 # - \#empty?:
-#   Returns whether the set has no elements.
-# - \#include?:
-#   Returns wheter a given object is an element in the collection.
+#   Returns whether the collection has no elements.
 #
 # ### Methods for Assigning/Inserting
 # 
@@ -82,23 +82,33 @@
 # ### Other Methods
 # 
 # - \#reverse:
-#   Reverse elements' order in the collection.
-# - \#sort:
-#   Sort elements' order based on attribute.
+#   Reverse collection's elements order.
+# - \#reverse!:
+#   Reverse collection's elements order in place.
 # 
 
 class MyArray
+  include Enumerable
+  
   attr_reader :length
+
+  # Creates a new MyArray containing the given objects.
+  # 
+  # MyArray['foo', 2]             #=> #<MyArray: ['foo', 2]>
+  # MyArray['foo', true, 'bar]    #=> #<MyArray: ['foo', true, 'bar']>
+  def self.[](*ary)
+    new(ary)
+  end
 
   # Creates a new MyArray containing the elements of the given collection
   # object
-  def initialize(*values)
+  def initialize(enum = nil)
     @length = 0
     @elements = Hash.new(nil)
 
-    return if values.empty?
+    return if enum.nil?
 
-    values.each do |val|
+    enum.each do |val|
       @elements[@length] = val
       @length += 1
     end
@@ -118,6 +128,7 @@ class MyArray
     return self
   end
 
+  # Returns the element at the given index.
   def [](index)
     @elements[index]
   end
@@ -130,10 +141,8 @@ class MyArray
       @length += 1
     end
     @elements[index] = element
-    @length += 1
+    @length += 1 if index == @length
   end
-
-  alias insert []=
   
   # Constant Time to add element to the end of collection if size
   # isn't equal capacity, otherwise Linear Time.
@@ -166,6 +175,7 @@ class MyArray
     return self
   end
 
+# Cosntant time to remove last element. Time Complexity => O(1)
   def pop
     latest_element = @elements[@length -1]
     @elements.delete(@length -1)
@@ -174,6 +184,16 @@ class MyArray
     return latest_element
   end
 
+  # Linear time to remove at the begining of the collection.
+  # Shifts other values. Time Complexity O(n)
+  def shift
+    first_element = @elements[0]
+    self.shift_elements(0)
+    return first_element
+  end
+
+  # Linear time to remove at an arbitrary location. Shifts other values.
+  # Time Complexity O(n)
   def delete_at(index)
     if index < @length
       element = @elements[index]
@@ -185,6 +205,8 @@ class MyArray
     end
   end
 
+  # Linear time to remove at an arbitrary location. Shifts other values.
+  # Time Complexity O(n)
   def delete(element)
     self.each.with_index do |value, index|
       if value == element
@@ -194,6 +216,35 @@ class MyArray
     end
     
     return nil
+  end
+
+  # Returns true if the collection has no elements.
+  def empty?
+    @length == 0
+  end
+
+  # Return collection with elements' order reversed.
+  def reverse
+    return self if @length <= 1
+    
+    reversed = MyArray[]
+    self.each { |value| reversed.unshift(value) }
+    return reversed
+  end
+
+  def reverse!
+    return self if @length <= 1
+
+    left_pointer = 0
+    right_pointer = @length - 1
+    while left_pointer < right_pointer
+      @elements[left_pointer], @elements[right_pointer] = @elements[right_pointer], @elements[left_pointer]
+      
+      left_pointer += 1
+      right_pointer -= 1
+    end
+
+    return self
   end
 
   # Returns a string containing a human-readable representation of the
