@@ -134,6 +134,16 @@ class MyArray
   end
   
   alias slice []
+
+  # Returns the position (index) of the given value.
+  # Time Complexity => O(n)
+  def find_index(value)
+    self.each.with_index do |element, index|
+      return index if element == value
+    end
+
+    return nil
+  end
   
   def []=(index, element)
     while index > @length
