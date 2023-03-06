@@ -280,7 +280,7 @@ class MyArray
 
   def unshift_elements(index, value)
     counter = @length - 1
-    until counter == (index - 1)
+    while counter >= index
       @elements[counter + 1] = @elements[counter]
       counter -= 1
     end
