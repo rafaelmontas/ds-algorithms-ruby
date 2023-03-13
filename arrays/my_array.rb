@@ -47,7 +47,7 @@
 # - \#push (aliased as #<<):
 #   Adds an element at the end of the collection; returns +self+.
 # - \#unshift:
-#   Adds an element at the begining of the collection; returns
+#   Adds an element at the beginning of the collection; returns
 #   +self+.
 # - \#insert:
 #   Adds an element at an arbitrary location of the collection;
@@ -63,7 +63,7 @@
 # ### Methods for Deleting
 # 
 # - \#shift:
-#   Removes an element from the begining of the collection; returns
+#   Removes an element from the beginning of the collection; returns
 #   the deleted element.
 # - \#delete_at:
 #   Removes an element from an arbitrary location of the collection;
@@ -86,6 +86,8 @@
 # - \#reverse!:
 #   Reverse collection's elements order in place.
 # 
+
+require '../algorithms/search'
 
 class MyArray
   include Enumerable
@@ -165,7 +167,7 @@ class MyArray
 
   alias << push
 
-  # Linear time to add at the begining of collection.
+  # Linear time to add at the beginning of collection.
   # Moves other values. Time Complexity => O(n)
   def unshift(value)
     self.unshift_elements(0, value)
@@ -185,7 +187,7 @@ class MyArray
     return self
   end
 
-# Cosntant time to remove last element. Time Complexity => O(1)
+  # Constant time to remove last element. Time Complexity => O(1)
   def pop
     latest_element = @elements[@length -1]
     @elements.delete(@length -1)
@@ -194,7 +196,7 @@ class MyArray
     return latest_element
   end
 
-  # Linear time to remove at the begining of the collection.
+  # Linear time to remove at the beginning of the collection.
   # Shifts other values. Time Complexity O(n)
   def shift
     first_element = @elements[0]
